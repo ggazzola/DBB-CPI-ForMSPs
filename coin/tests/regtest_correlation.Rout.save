@@ -1,0 +1,143 @@
+
+R Under development (unstable) (2015-05-13 r68364) -- "Unsuffered Consequences"
+Copyright (C) 2015 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> ### Regression tests for the correlation problem, i.e.,
+> ### testing the independence of two numeric variables
+> ### `x' and `y' (possibly blocked)
+> 
+> set.seed(290875)
+> library("coin")
+Loading required package: survival
+> isequal <- coin:::isequal
+> options(useFancyQuotes = FALSE)
+> 
+> ### generate data
+> dat <- data.frame(x = rnorm(100), y = rnorm(100), block = gl(10, 10))
+> 
+> ### not really the same, T = (rank(x) - rank(y))^2 is used here
+> cor.test(~ x + y, data = dat, method = "spearman")$p.value
+[1] 0.8474266
+> cor.test(~ x + y, data = dat, alternative = "less", method = "spearman")$p.value
+[1] 0.5763332
+> cor.test(~ x + y, data = dat, alternative = "greater", method = "spearman")$p.value
+[1] 0.4237133
+> 
+> ### without blocks
+> pvalue(spearman_test(y ~ x, data = dat))
+[1] 0.846517
+> pvalue(spearman_test(x ~ y, data = dat))
+[1] 0.846517
+> pvalue(spearman_test( ~ y + x, data = dat))
+[1] 0.846517
+> pvalue(spearman_test( ~ x + y, data = dat))
+[1] 0.846517
+> 
+> pvalue(fisyat_test(y ~ x, data = dat))
+[1] 0.9155477
+> pvalue(fisyat_test(x ~ y, data = dat))
+[1] 0.9155477
+> pvalue(fisyat_test( ~ y + x, data = dat))
+[1] 0.9155477
+> pvalue(fisyat_test( ~ x + y, data = dat))
+[1] 0.9155477
+> 
+> pvalue(quadrant_test(y ~ x, data = dat))
+[1] 0.6906339
+> pvalue(quadrant_test(x ~ y, data = dat))
+[1] 0.6906339
+> pvalue(quadrant_test( ~ y + x, data = dat))
+[1] 0.6906339
+> pvalue(quadrant_test( ~ x + y, data = dat))
+[1] 0.6906339
+> 
+> pvalue(koziol_test(y ~ x, data = dat))
+[1] 0.7825737
+> pvalue(koziol_test(x ~ y, data = dat))
+[1] 0.7825737
+> pvalue(koziol_test( ~ y + x, data = dat))
+[1] 0.7825737
+> pvalue(koziol_test( ~ x + y, data = dat))
+[1] 0.7825737
+> 
+> ### with blocks
+> pvalue(spearman_test(y ~ x | block, data = dat))
+[1] 0.8901013
+> pvalue(spearman_test(x ~ y | block, data = dat))
+[1] 0.8901013
+> pvalue(spearman_test( ~ y + x | block, data = dat))
+[1] 0.8901013
+> pvalue(spearman_test( ~ x + y | block, data = dat))
+[1] 0.8901013
+> 
+> pvalue(fisyat_test(y ~ x | block, data = dat))
+[1] 0.9061762
+> pvalue(fisyat_test(x ~ y | block, data = dat))
+[1] 0.9061762
+> pvalue(fisyat_test( ~ y + x | block, data = dat))
+[1] 0.9061762
+> pvalue(fisyat_test( ~ x + y | block, data = dat))
+[1] 0.9061762
+> 
+> pvalue(quadrant_test(y ~ x | block, data = dat))
+[1] 0.7489036
+> pvalue(quadrant_test(x ~ y | block, data = dat))
+[1] 0.7489036
+> pvalue(quadrant_test( ~ y + x | block, data = dat))
+[1] 0.7489036
+> pvalue(quadrant_test( ~ x + y | block, data = dat))
+[1] 0.7489036
+> 
+> pvalue(koziol_test(y ~ x | block, data = dat))
+[1] 0.8408785
+> pvalue(koziol_test(x ~ y | block, data = dat))
+[1] 0.8408785
+> pvalue(koziol_test( ~ y + x | block, data = dat))
+[1] 0.8408785
+> pvalue(koziol_test( ~ x + y | block, data = dat))
+[1] 0.8408785
+> 
+> ### sanity checks, those should be errors
+> dat <- data.frame(x = gl(2, 50), y = rnorm(100), block = rnorm(100))
+> 
+> try(spearman_test(y ~ x, data = dat))
+Error in check(object) : 
+  'object' does not represent a univariate correlation problem
+> try(spearman_test(y ~ x | block, data = dat))
+Error in .local(.Object, ...) : 'block' is not a factor
+> 
+> try(fisyat_test(y ~ x, data = dat))
+Error in check(object) : 
+  'object' does not represent a univariate correlation problem
+> try(fisyat_test(y ~ x | block, data = dat))
+Error in .local(.Object, ...) : 'block' is not a factor
+> 
+> try(quadrant_test(y ~ x, data = dat))
+Error in check(object) : 
+  'object' does not represent a univariate correlation problem
+> try(quadrant_test(y ~ x | block, data = dat))
+Error in .local(.Object, ...) : 'block' is not a factor
+> 
+> try(koziol_test(y ~ x, data = dat))
+Error in check(object) : 
+  'object' does not represent a univariate correlation problem
+> try(koziol_test(y ~ x | block, data = dat))
+Error in .local(.Object, ...) : 'block' is not a factor
+> 
+> proc.time()
+   user  system elapsed 
+   0.88    0.04    0.96 
