@@ -1,4 +1,4 @@
-useDynLib(extendedForestGGG)
+useDynLib(extendedForestGGG)###
 
 export(combine, getTree, grow, importance, margin, MDSplot, na.roughfix,
        partialPlot, randomForest, rfImpute, treesize, tuneRF,
